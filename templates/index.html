@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="chat-container">
+        <h1>Chat with Gemini AI</h1>
+        <div id="chatbox" class="chatbox"></div>
+        <input type="text" id="user-input" placeholder="Type a message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const userMessage = document.getElementById('user-input').value;
+
+            if (!userMessage) {
+                alert("Please enter a message");
+                return;
+            }
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: userMessage }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const chatbox = document.getElementById('chatbox');
+                chatbox.innerHTML += `<div class="user-message">User: ${userMessage}</div>`;
+                if (data.reply) {
+                    chatbox.innerHTML += `<div class="bot-message">Bot: ${data.reply}</div>`;
+                } else {
+                    chatbox.innerHTML += `<div class="bot-message">Bot: No response received</div>`;
+                }
+                document.getElementById('user-input').value = ''; // Clear the input field
+                chatbox.scrollTop = chatbox.scrollHeight; // Scroll to the bottom
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+{% endblock %}
