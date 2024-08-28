@@ -1,11 +1,7 @@
-from flask import Flask, request, jsonify,render_template,url_for
-import google.generativeai as genai
+from flask import Flask, request, jsonify, render_template, url_for
 import os
 
 app = Flask(__name__)
-
-genai.configure(api_key=os.environ['API_KEY'])
-model = genai.GenerativeModel('gemini-1.5-flash')
 
 messages = []
 
@@ -21,6 +17,13 @@ def chat():
         return jsonify({"error": "No message provided"}), 400
     
     try:
+        # Lazy load the google.generativeai module
+        import google.generativeai as genai
+
+        # Configure the API key
+        genai.configure(api_key=os.environ['API_KEY'])
+        model = genai.GenerativeModel('gemini-1.5-flash')
+
         # Store user message
         messages.append({'role': 'user', 'message': user_message})
 
